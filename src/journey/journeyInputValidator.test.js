@@ -1,6 +1,6 @@
-const { validateSearch } = require('./searchInputValidator')
+const { validateSearchJourney } = require('./journeyInputValidator')
 
-describe('validateSearch', () => {
+describe('validateSearchJourney', () => {
   let baseInput
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if origin latitude is set, but origin longitude and origin withinDistance are missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         latitude: 1
@@ -19,7 +19,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if origin longitude is set, but origin latitude and origin withinDistance are missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         longitude: 1
@@ -28,7 +28,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if origin withinDistance is set, but origin longitude and origin latitude are missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         withinDistance: 100
@@ -37,7 +37,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if origin latitude and origin longitude are set, but origin withinDistance is missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         latitude: 2,
@@ -47,7 +47,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if origin longitude and origin withinDistance are set, but origin latitude is missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         longitude: 3,
@@ -57,7 +57,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if origin latitude and origin withinDistance are set, but origin longitude is missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         latitude: 2,
@@ -67,7 +67,7 @@ describe('validateSearch', () => {
   })
 
   it('should return true if origin latitude, origin longitude and origin withinDistance are all set', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       origin: {
         latitude: 2,
@@ -78,7 +78,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if destination latitude is set, but destination longitude and destination withinDistance are missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         latitude: 1
@@ -87,7 +87,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if destination longitude is set, but destination latitude and destination withinDistance are missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         longitude: 1
@@ -96,7 +96,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if destination withinDistance is set, but destination longitude and destination latitude are missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         withinDistance: 100
@@ -105,7 +105,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if destination latitude and destination longitude are set, but destination withinDistance is missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         latitude: 2,
@@ -115,7 +115,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if destination longitude and destination withinDistance are set, but destination latitude is missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         longitude: 3,
@@ -125,7 +125,7 @@ describe('validateSearch', () => {
   })
 
   it('should reject input if destination latitude and destination withinDistance are set, but destination longitude is missing', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         latitude: 2,
@@ -135,7 +135,7 @@ describe('validateSearch', () => {
   })
 
   it('should return true if destination latitude, destination longitude and destination withinDistance are all set', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput,
       destination: {
         latitude: 2,
@@ -146,7 +146,7 @@ describe('validateSearch', () => {
   })
 
   it('should return true if none of destination latitude, destination longitude and destination withinDistance are set', () => {
-    expect(validateSearch({
+    expect(validateSearchJourney({
       ...baseInput
     })).toEqual(true)
   })

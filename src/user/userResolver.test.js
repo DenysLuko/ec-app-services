@@ -76,8 +76,10 @@ describe('userResolver', () => {
   })
 
   describe('createUser', () => {
-    it('should call client with the correct query if all fields are present', async () => {
-      await createUser({ input: {
+    let result
+
+    beforeEach(async () => {
+      result = await createUser({ input: {
           name: 'AnotherJack',
           lastName: 'AnotherBlack',
           birthday: '1991-12-03',
@@ -87,7 +89,9 @@ describe('userResolver', () => {
           password: 'abcdefg'
         }
       }, mockClient)
+    })
 
+    it('should call client with the correct query if all fields are present', async () => {
       expect(mockClient.query).toHaveBeenCalledWith({
         text: 'INSERT INTO app_user (name, last_name, birthday, photo, username, email, password) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;',
         values: ['AnotherJack', 'AnotherBlack', '1991-12-03', 'anotherphoto.jpg', 'misterBlack', 'ajbj@email.com', 'abcdefg']
@@ -95,12 +99,10 @@ describe('userResolver', () => {
     })
 
     it('should call user mapper with the response', async () => {
-      await user({ id: 1 }, mockClient)
       expect(mockMapUser).toHaveBeenCalledWith(mockUserResponse)
     })
 
     it('should return the result from the mapper', async () => {
-      const result = await user({ id: 1 }, mockClient)
       expect(result).toEqual(mockMapperResult)
     })
   })

@@ -17,11 +17,11 @@ import {
   userMutation
 } from './user'
 import {
-  searchResolver,
-  searchInput,
-  searchType,
-  searchQuery
-} from './search'
+  journeyResolver,
+  journeyInput,
+  journeyType,
+  journeyQuery
+} from './journey'
 
 types.setTypeParser(20, parseInt)
 
@@ -38,11 +38,11 @@ const client = new Client({
 const schema = buildSchema(`
   ${userInput}
   ${userType}
-  ${searchInput}
-  ${searchType}
+  ${journeyInput}
+  ${journeyType}
   type Query {
     ${userQuery}
-    ${searchQuery}
+    ${journeyQuery}
   }
   type Mutation {
     ${userMutation}
@@ -51,7 +51,7 @@ const schema = buildSchema(`
 
 const root = {
   ...userResolver,
-  ...searchResolver
+  ...journeyResolver
 }
 
 serverInstance.use('/api/graphqldebug', graphqlHTTP({

@@ -6,9 +6,6 @@ import {
   zipInputObject,
   camelCaseToSnakeCase
 } from '../utils'
-import {
-  validateUserInput
-} from './userInputValidator'
 
 const buildGetUserQuery = (id) => ({
   text: 'SELECT * FROM app_user WHERE id = $1;',
@@ -65,7 +62,7 @@ export const userResolver = {
     id,
     input
   }, client) => {
-    const inputValid = validateUserInput(input)
+    const inputValid = Object.keys(input).length > 0
 
     if (!inputValid) {
       throw new Error('updateUser resolver received invalid input')

@@ -1,4 +1,4 @@
-export const validateSearch = ({
+export const validateSearchJourney = ({
   origin: {
     longitude: originLongitude,
     latitude: originLatitude,

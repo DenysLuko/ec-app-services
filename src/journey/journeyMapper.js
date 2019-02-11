@@ -10,7 +10,7 @@ import {
   snakeCaseToCamelCase
 } from '../utils/snakeCaseFromToCamelCase'
 
-const mapRow = ({
+export const mapJourney = ({
   travelling_user_id,
   travelling_user_name,
   travelling_user_last_name,
@@ -38,6 +38,7 @@ const mapRow = ({
   ...rest
 }) => {
   const {
+    journeyId,
     journeyName,
     journeyDescription,
     journeyDate,
@@ -74,6 +75,7 @@ const mapRow = ({
   }
 
   return {
+    journeyId,
     journeyName,
     journeyDescription,
     journeyStatus,
@@ -88,12 +90,12 @@ const mapRow = ({
   }
 }
 
-export const mapSearch = ({
+export const mapJourneySearch = ({
   rowCount = 0,
   rows = []
 }, offset) => {
 
-  const results = rows.map(mapRow)
+  const results = rows.map(mapJourney)
 
   return {
     resultCount: rowCount,
