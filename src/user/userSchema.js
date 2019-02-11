@@ -34,7 +34,7 @@ export const userType = `
 `
 
 export const userQuery = `
-  user(id: Int!): User
+  getUser(id: Int!): User
 `
 
 export const userMutation = `

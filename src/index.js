@@ -10,18 +10,26 @@ import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
 import {
-  userResolver,
   userInput,
   userType,
   userQuery,
-  userMutation
+  userMutation,
+  userResolver
 } from './user'
 import {
-  journeyResolver,
   journeyInput,
   journeyType,
-  journeyQuery
+  journeyQuery,
+  journeyMutation,
+  journeyResolver
 } from './journey'
+import {
+  deliveryInput,
+  deliveryType,
+  deliveryQuery,
+  deliveryMutation,
+  deliveryResolver
+} from './delivery'
 
 types.setTypeParser(20, parseInt)
 
@@ -40,18 +48,24 @@ const schema = buildSchema(`
   ${userType}
   ${journeyInput}
   ${journeyType}
+  ${deliveryInput}
+  ${deliveryType}
   type Query {
     ${userQuery}
     ${journeyQuery}
+    ${deliveryQuery}
   }
   type Mutation {
     ${userMutation}
+    ${journeyMutation}
+    ${deliveryMutation}
   }
 `)
 
 const root = {
   ...userResolver,
-  ...journeyResolver
+  ...journeyResolver,
+  ...deliveryResolver
 }
 
 serverInstance.use('/api/graphqldebug', graphqlHTTP({

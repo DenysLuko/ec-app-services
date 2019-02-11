@@ -4,7 +4,7 @@ import {
 } from './userResolver'
 
 const {
-  user,
+  getUser,
   createUser,
   updateUser
 } = userResolver
@@ -45,7 +45,7 @@ describe('userResolver', () => {
 
   describe('user', () => {
     it('should call client with the correct query', async () => {
-      await user({ id: 1 }, mockClient)
+      await getUser({ id: 1 }, mockClient)
 
       expect(mockClient.query).toHaveBeenCalledWith({
         text: 'SELECT * FROM app_user WHERE id = $1;',
@@ -54,12 +54,12 @@ describe('userResolver', () => {
     })
 
     it('should call user mapper with the response', async () => {
-      await user({ id: 1 }, mockClient)
+      await getUser({ id: 1 }, mockClient)
       expect(mockMapUser).toHaveBeenCalledWith(mockUserResponse)
     })
 
     it('should return the result from the mapper', async () => {
-      const result = await user({ id: 1 }, mockClient)
+      const result = await getUser({ id: 1 }, mockClient)
       expect(result).toEqual({
         id: 1,
         username: 'mockUser'
@@ -71,7 +71,7 @@ describe('userResolver', () => {
         throw new Error('Some Error')
       })
 
-      expect(user({ id: 1 }, mockClient)).rejects.toThrow('Some Error')
+      expect(getUser({ id: 1 }, mockClient)).rejects.toThrow('Some Error')
     })
   })
 

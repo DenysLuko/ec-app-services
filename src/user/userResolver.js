@@ -23,7 +23,7 @@ const buildUpdateUserQuery = (id, columnNames = [], columnValues = []) => ({
 })
 
 export const userResolver = {
-  user: async ({ id } = {}, client) => {
+  getUser: async ({ id } = {}, client) => {
     const query = buildGetUserQuery(id)
 
     const result = await client.query(query)
