@@ -43,7 +43,7 @@ describe('userResolver', () => {
     userResolverRewireAPI.__Rewire__('mapUser', mockMapUser)
   })
 
-  describe('user', () => {
+  describe('getUser', () => {
     it('should call client with the correct query', async () => {
       await getUser({ id: 1 }, mockClient)
 

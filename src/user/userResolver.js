@@ -37,7 +37,7 @@ export const userResolver = {
     return mapUser(dbUserObject)
   },
 
-  createUser: async ({ input } = {}, client) => {
+  createUser: async ({ input }, client) => {
     const snakeCasedInput = camelCaseToSnakeCase(input)
 
     const {

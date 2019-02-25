@@ -1,27 +1,66 @@
 export const deliveryInput = `
-
-`
-
-export const deliveryType = `
-  type Delivery {
-    deliveryId: Int!
-    deliveryName: String
-    deliveryDescription: String
-    journey: Journey
-    deliveryWeightKg: Int
-    deliveryWidthCm: Int
-    deliveryHeightCm: Int
-    deliveryDepthCm: Int
-    deliveryCurrency: String
-    deliveryValue: Float
+  input NewDeliveryInput {
+    name: String
+    description: String
+    journey: Journey!
+    weightKg: Int
+    widthCm: Int
+    heightCm: Int
+    depthCm: Int
+    currency: String
+    value: Float
     sender: User!
     receiver: User
     deliveryStatus: String!
     deliveryRating: Int
     deliveryComment: String
-    deliverySenderRating: Int
-    deliverySenderComent: String
-    deliveryCancelledComment: String
+    senderRating: Int
+    senderComment: String
+    cancelledComment: String
+  }
+
+  input ExistingDeliveryInput {
+    id: Int!
+    name: String
+    description: String
+    journey: Journey
+    weightKg: Int
+    widthCm: Int
+    heightCm: Int
+    depthCm: Int
+    currency: String
+    value: Float
+    sender: User
+    receiver: User
+    deliveryStatus: String
+    deliveryRating: Int
+    deliveryComment: String
+    senderRating: Int
+    senderComment: String
+    cancelledComment: String
+  }
+`
+
+export const deliveryType = `
+  type Delivery {
+    id: Int!
+    name: String
+    description: String
+    journey: Journey!
+    weightKg: Int
+    widthCm: Int
+    heightCm: Int
+    depthCm: Int
+    currency: String
+    value: Float
+    sender: User!
+    receiver: User
+    deliveryStatus: String!
+    deliveryRating: Int
+    deliveryComment: String
+    senderRating: Int
+    senderComment: String
+    cancelledComment: String
   }
 `
 

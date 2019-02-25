@@ -88,40 +88,40 @@ describe('deliveryMapper', () => {
       result = mapDelivery(mockDeliveryResponse)
     })
 
-    it('should return the deliveryId', () => {
-      expect(result).toHaveProperty('deliveryId', 1)
+    it('should return the id', () => {
+      expect(result).toHaveProperty('id', 1)
     })
 
-    it('should return the deliveryName', () => {
-      expect(result).toHaveProperty('deliveryName', 'PS4')
+    it('should return the name', () => {
+      expect(result).toHaveProperty('name', 'PS4')
     })
 
-    it('should return the deliveryDescription', () => {
-      expect(result).toHaveProperty('deliveryDescription', 'console with a few games')
+    it('should return the description', () => {
+      expect(result).toHaveProperty('description', 'console with a few games')
     })
 
-    it('should return the deliveryWeightKg', () => {
-      expect(result).toHaveProperty('deliveryWeightKg', 0.5)
+    it('should return the weightKg', () => {
+      expect(result).toHaveProperty('weightKg', 0.5)
     })
 
-    it('should return the deliveryWidthCm', () => {
-      expect(result).toHaveProperty('deliveryWidthCm', null)
+    it('should return the widthCm', () => {
+      expect(result).toHaveProperty('widthCm', null)
     })
 
-    it('should return the deliveryHeightCm', () => {
-      expect(result).toHaveProperty('deliveryHeightCm', null)
+    it('should return the heightCm', () => {
+      expect(result).toHaveProperty('heightCm', null)
     })
 
-    it('should return the deliveryDepthCm', () => {
-      expect(result).toHaveProperty('deliveryDepthCm', null)
+    it('should return the depthCm', () => {
+      expect(result).toHaveProperty('depthCm', null)
     })
 
-    it('should return the deliveryCurrency', () => {
-      expect(result).toHaveProperty('deliveryCurrency', 'USD')
+    it('should return the currency', () => {
+      expect(result).toHaveProperty('currency', 'USD')
     })
 
-    it('should return the deliveryValue', () => {
-      expect(result).toHaveProperty('deliveryValue', 150)
+    it('should return the value', () => {
+      expect(result).toHaveProperty('value', 150)
     })
 
     it('should return the deliveryStatus', () => {
@@ -136,16 +136,16 @@ describe('deliveryMapper', () => {
       expect(result).toHaveProperty('deliveryComment', 'Everything went as planned. Thank you!')
     })
 
-    it('should return the deliverySenderRating', () => {
-      expect(result).toHaveProperty('deliverySenderRating', 5)
+    it('should return the senderRating', () => {
+      expect(result).toHaveProperty('senderRating', 5)
     })
 
-    it('should return the deliverySenderComment', () => {
-      expect(result).toHaveProperty('deliverySenderComment', 'Picked up as agreed')
+    it('should return the senderComment', () => {
+      expect(result).toHaveProperty('senderComment', 'Picked up as agreed')
     })
 
-    it('should return the deliveryCancelledComment', () => {
-      expect(result).toHaveProperty('deliveryCancelledComment', null)
+    it('should return the cancelledComment', () => {
+      expect(result).toHaveProperty('cancelledComment', null)
     })
 
     it('should call mapJourney with the correct arguments', () => {
