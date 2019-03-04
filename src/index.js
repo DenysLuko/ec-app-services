@@ -10,18 +10,26 @@ import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
 import {
-  userResolver,
   userInput,
   userType,
   userQuery,
-  userMutation
+  userMutation,
+  userResolver
 } from './user'
 import {
-  searchResolver,
-  searchInput,
-  searchType,
-  searchQuery
-} from './search'
+  journeyInput,
+  journeyType,
+  journeyQuery,
+  journeyMutation,
+  journeyResolver
+} from './journey'
+import {
+  deliveryInput,
+  deliveryType,
+  deliveryQuery,
+  deliveryMutation,
+  deliveryResolver
+} from './delivery'
 
 types.setTypeParser(20, parseInt)
 
@@ -38,27 +46,38 @@ const client = new Client({
 const schema = buildSchema(`
   ${userInput}
   ${userType}
-  ${searchInput}
-  ${searchType}
+  ${journeyInput}
+  ${journeyType}
+  ${deliveryInput}
+  ${deliveryType}
   type Query {
     ${userQuery}
-    ${searchQuery}
+    ${journeyQuery}
+    ${deliveryQuery}
   }
   type Mutation {
     ${userMutation}
+    ${journeyMutation}
+    ${deliveryMutation}
   }
 `)
 
 const root = {
   ...userResolver,
-  ...searchResolver
+  ...journeyResolver,
+  ...deliveryResolver
 }
 
 serverInstance.use('/api/graphqldebug', graphqlHTTP({
   schema: schema,
   rootValue: root,
   graphiql: true,
-  context: client
+  context: client,
+  formatError: (err) => ({
+    ...err,
+    message: JSON.parse(err.message).message,
+    error: JSON.parse(err.message)
+  })
 }))
 
 serverInstance.use('/api/graphql', graphqlHTTP({
@@ -73,7 +92,12 @@ serverInstance.get('/', function (req, res) {
 })
 
 const startGraphQLServer = async (serverInstance, client) => {
-  await client.connect()
+  try {
+    await client.connect()
+  } catch (e) {
+    console.log('DB error: ', e)
+    return
+  }
 
   serverInstance
     .listen(process.env.APP_SERVICE_PORT)

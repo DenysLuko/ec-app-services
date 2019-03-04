@@ -1,5 +1,5 @@
 export const userInput = `
-  input NewUserInput {
+  input CreateUserInput {
     name: String
     lastName: String
     birthday: String
@@ -9,7 +9,8 @@ export const userInput = `
     password: String
   }
 
-  input ExistingUserInput {
+  input UpdateUserInput {
+    id: Int!
     name: String
     lastName: String
     birthday: String
@@ -34,10 +35,10 @@ export const userType = `
 `
 
 export const userQuery = `
-  user(id: String): User
+  getUser(id: Int!): User
 `
 
 export const userMutation = `
-  createUser(input: NewUserInput!): User
-  updateUser(id: Int!, input: ExistingUserInput!): User
+  createUser(input: CreateUserInput!): User
+  updateUser(input: UpdateUserInput!): User
 `

@@ -8,3 +8,6 @@ export {
 export {
   zipInputObject
 } from './zipInputObject'
+export {
+  generateQueryError
+} from './generateQueryError'
