@@ -41,7 +41,8 @@ const buildSearchQuery = ({
   let limitClause
   let offsetClause
   let nextPlaceholder = 1
-  let values = []
+
+  const values = []
 
   if (date && dateRange) {
     const fromDate = moment(date).subtract(dateRange, 'days').format('YYYY-MM-DD')
@@ -120,7 +121,7 @@ const buildCreateJourneyQuery = (columnNames = [], columnValues = []) => ({
   values: [...columnValues]
 })
 
-const buildGetJourneyQuery = (id) => ({
+const buildGetJourneyQuery = id => ({
   text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
   values: [id]
 })

@@ -1,5 +1,6 @@
 import {
   userResolver,
+  // eslint-disable-next-line import/named
   __RewireAPI__ as userResolverRewireAPI
 } from './userResolver'
 
@@ -99,7 +100,8 @@ describe('userResolver', () => {
     let result
 
     beforeEach(async () => {
-      result = await createUser({ input: {
+      result = await createUser({
+        input: {
           name: 'AnotherJack',
           lastName: 'AnotherBlack',
           birthday: '1991-12-03',
@@ -153,7 +155,7 @@ describe('userResolver', () => {
 
   describe('updateUser', () => {
     it('should throw an error if the input is invalid', async () => {
-      await expect(updateUser({id: 1, input: {}}, mockClient)).rejects.toThrowError(Error)
+      await expect(updateUser({ id: 1, input: {} }, mockClient)).rejects.toThrowError(Error)
     })
 
     it('should call client with the correct query if all fields are present', async () => {

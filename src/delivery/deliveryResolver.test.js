@@ -1,5 +1,6 @@
 import {
   deliveryResolver,
+  // eslint-disable-next-line import/named
   __RewireAPI__ as deliveryResolverRewireAPI
 } from './deliveryResolver'
 
@@ -59,7 +60,7 @@ describe('deliveryResolver', () => {
           text: 'SELECT * FROM delivery_view WHERE delivery_id = $1;',
           values: [1]
         },
-        originalError: originalError
+        originalError
       })
 
       await expect(getDelivery({ id: 1 }, mockClient)).rejects

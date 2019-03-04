@@ -8,7 +8,7 @@ import {
   generateQueryError
 } from '../utils'
 
-const buildGetUserQuery = (id) => ({
+const buildGetUserQuery = id => ({
   text: 'SELECT * FROM app_user WHERE id = $1;',
   values: [id]
 })
@@ -31,7 +31,7 @@ export const userResolver = {
 
     try {
       getResult = await client.query(getQuery)
-    } catch(originalError) {
+    } catch (originalError) {
       throw generateQueryError('Query Error', getQuery, originalError)
     }
 

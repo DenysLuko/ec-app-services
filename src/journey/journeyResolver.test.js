@@ -1,5 +1,6 @@
 import {
   journeyResolver,
+  // eslint-disable-next-line import/named
   __RewireAPI__ as journeyResolverRewireAPI
 } from './journeyResolver'
 
@@ -36,7 +37,8 @@ describe('journeyResolver', () => {
 
       journeyResolverRewireAPI.__Rewire__('mapJourney', mockMapJourney)
 
-      createJourneyResolverResult = await createJourney({ input: {
+      createJourneyResolverResult = await createJourney({
+        input: {
           name: 'LHR -> Moon',
           description: 'Take whatever you want',
           date: '2044-11-03',
@@ -134,7 +136,7 @@ describe('journeyResolver', () => {
           rowCount: 0,
           rows: []
         }).mockResolvedValueOnce({
-          rowCount:1,
+          rowCount: 1,
           rows: [mockGetResult]
         })
       }
@@ -151,7 +153,7 @@ describe('journeyResolver', () => {
     })
 
     it('should throw an error if the input is empty', async () => {
-      await expect(updateJourney({input: { id: 1 }}, mockClient)).rejects.toThrowError(Error)
+      await expect(updateJourney({ input: { id: 1 } }, mockClient)).rejects.toThrowError(Error)
     })
 
     it('should call client with the correct query', async () => {
@@ -315,7 +317,13 @@ describe('journeyResolver', () => {
     })
 
     it('should throw an error if the input is invalid', async () => {
-      await expect(searchJourney({input: { origin: { longitude: 50 } }}, mockClient)).rejects.toThrowError(Error)
+      await expect(searchJourney({
+        input: {
+          origin: {
+            longitude: 50
+          }
+        }
+      }, mockClient)).rejects.toThrowError(Error)
     })
 
     describe('queries', () => {
@@ -352,11 +360,11 @@ describe('journeyResolver', () => {
           }
         }, mockClient)
 
-        let dateClause = 'journey_date BETWEEN $1 AND $2'
-        let expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($3, $4)) < $5'
-        let expectedToLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(destination_longitude, destination_latitude), ST_MAKEPOINT($6, $7)) < $8'
-        let limitClause = 'LIMIT $9'
-        let offsetClause = 'OFFSET $10'
+        const dateClause = 'journey_date BETWEEN $1 AND $2'
+        const expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($3, $4)) < $5'
+        const expectedToLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(destination_longitude, destination_latitude), ST_MAKEPOINT($6, $7)) < $8'
+        const limitClause = 'LIMIT $9'
+        const offsetClause = 'OFFSET $10'
 
         expect(mockClient.query).toHaveBeenCalledWith({
           text: `SELECT * FROM journey_view WHERE ${dateClause} AND ${expectedFromLocationClause} AND ${expectedToLocationClause} ${limitClause} ${offsetClause};`,
@@ -488,8 +496,8 @@ describe('journeyResolver', () => {
             }
           }, mockClient)
 
-          let expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($1, $2)) < $3'
-          let expectedToLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(destination_longitude, destination_latitude), ST_MAKEPOINT($4, $5)) < $6'
+          const expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($1, $2)) < $3'
+          const expectedToLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(destination_longitude, destination_latitude), ST_MAKEPOINT($4, $5)) < $6'
 
           expect(mockClient.query).toHaveBeenCalledWith({
             text: `SELECT * FROM journey_view WHERE ${expectedFromLocationClause} AND ${expectedToLocationClause};`,
@@ -511,8 +519,8 @@ describe('journeyResolver', () => {
             }
           }, mockClient)
 
-          let expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($1, $2)) < $3'
-          let expectedToLocationClause = 'destination_id = $4'
+          const expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($1, $2)) < $3'
+          const expectedToLocationClause = 'destination_id = $4'
 
           expect(mockClient.query).toHaveBeenCalledWith({
             text: `SELECT * FROM journey_view WHERE ${expectedFromLocationClause} AND ${expectedToLocationClause};`,
@@ -534,8 +542,8 @@ describe('journeyResolver', () => {
             }
           }, mockClient)
 
-          let expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($1, $2)) < $3'
-          let expectedToLocationClause = 'destination_id = $4'
+          const expectedFromLocationClause = 'ST_Distance_Sphere(ST_MAKEPOINT(origin_longitude, origin_latitude), ST_MAKEPOINT($1, $2)) < $3'
+          const expectedToLocationClause = 'destination_id = $4'
 
           expect(mockClient.query).toHaveBeenCalledWith({
             text: `SELECT * FROM journey_view WHERE ${expectedFromLocationClause} AND ${expectedToLocationClause};`,
