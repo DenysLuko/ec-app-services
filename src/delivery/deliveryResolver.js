@@ -2,7 +2,8 @@ import { mapDelivery } from './deliveryMapper'
 import {
   generatePlaceholders,
   zipInputObject,
-  camelCaseToSnakeCase
+  camelCaseToSnakeCase,
+  generateQueryError
 } from '../utils'
 
 const buildGetDeliveryQuery = (id) => ({
@@ -11,26 +12,32 @@ const buildGetDeliveryQuery = (id) => ({
 })
 
 const buildCreateDeliveryQuery = (columnNames = [], columnValues = []) => ({
-  text: `INSERT INTO delivery (${columnNames.join(', ')}) VALUES (${generatePlaceholders(columnValues.length)}) RETURNING *;`,
+  text: `INSERT INTO delivery (${columnNames.join(', ')}) VALUES (${generatePlaceholders(columnValues.length)}) RETURNING id;`,
   values: [...columnValues]
 })
 
 const buildUpdateDeliveryQuery = (id, columnNames = [], columnValues = []) => ({
-  text: `UPDATE delivery SET ${columnNames.map((col, ind) => `${col} = $${ind + 2}`).join(', ')} WHERE id = $1 RETURNING *;`,
+  text: `UPDATE delivery SET ${columnNames.map((col, ind) => `${col} = $${ind + 2}`).join(', ')} WHERE id = $1;`,
   values: [id, ...columnValues]
 })
 
 export const deliveryResolver = {
-  getDelivery: async ({ deliveryId }, client) => {
-    const query = buildGetDeliveryQuery(deliveryId)
+  getDelivery: async ({ id }, client) => {
+    const query = buildGetDeliveryQuery(id)
 
-    const result = await client.query(query)
+    let getResult
+
+    try {
+      getResult = await client.query(query)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', query, originalError)
+    }
 
     const {
       rows: [
         dbDeliveryObject
       ] = []
-    } = result
+    } = getResult
 
     return mapDelivery(dbDeliveryObject)
   },
@@ -45,13 +52,37 @@ export const deliveryResolver = {
 
     const createDeliveryQuery = buildCreateDeliveryQuery(columnNames, columnValues)
 
-    const result = await client.query(createDeliveryQuery)
+    let createResult
+
+    try {
+      createResult = await client.query(createDeliveryQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', createDeliveryQuery, originalError)
+    }
+
+    const {
+      rows: [
+        {
+          id: newDeliveryId
+        }
+      ]
+    } = createResult
+
+    const getQuery = buildGetDeliveryQuery(newDeliveryId)
+
+    let getResult
+
+    try {
+      getResult = await client.query(getQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', getQuery, originalError)
+    }
 
     const {
       rows: [
         dbUserObject
-      ] = []
-    } = result
+      ]
+    } = getResult
 
     return mapDelivery(dbUserObject)
   },
@@ -71,13 +102,27 @@ export const deliveryResolver = {
 
     const updateDeliveryQuery = buildUpdateDeliveryQuery(id, columnNames, columnValues)
 
-    const result = await client.query(updateDeliveryQuery)
+    try {
+      await client.query(updateDeliveryQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', updateDeliveryQuery, originalError)
+    }
+
+    const getQuery = buildGetDeliveryQuery(id)
+
+    let getResult
+
+    try {
+      getResult = await client.query(getQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', getQuery, originalError)
+    }
 
     const {
       rows: [
         dbUserObject
-      ] = []
-    } = result
+      ]
+    } = getResult
 
     return mapDelivery(dbUserObject)
   }

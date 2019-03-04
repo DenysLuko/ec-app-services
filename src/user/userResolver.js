@@ -4,7 +4,8 @@ import {
 import {
   generatePlaceholders,
   zipInputObject,
-  camelCaseToSnakeCase
+  camelCaseToSnakeCase,
+  generateQueryError
 } from '../utils'
 
 const buildGetUserQuery = (id) => ({
@@ -24,15 +25,21 @@ const buildUpdateUserQuery = (id, columnNames = [], columnValues = []) => ({
 
 export const userResolver = {
   getUser: async ({ id } = {}, client) => {
-    const query = buildGetUserQuery(id)
+    const getQuery = buildGetUserQuery(id)
 
-    const result = await client.query(query)
+    let getResult
+
+    try {
+      getResult = await client.query(getQuery)
+    } catch(originalError) {
+      throw generateQueryError('Query Error', getQuery, originalError)
+    }
 
     const {
       rows: [
         dbUserObject
       ] = []
-    } = result
+    } = getResult
 
     return mapUser(dbUserObject)
   },
@@ -47,28 +54,36 @@ export const userResolver = {
 
     const createUserQuery = buildCreateUserQuery(columnNames, columnValues)
 
-    const result = await client.query(createUserQuery)
+    let createResult
+
+    try {
+      createResult = await client.query(createUserQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', createUserQuery, originalError)
+    }
 
     const {
       rows: [
         dbUserObject
       ] = []
-    } = result
+    } = createResult
 
     return mapUser(dbUserObject)
   },
 
-  updateUser: async ({
-    id,
-    input
-  }, client) => {
-    const inputValid = Object.keys(input).length > 0
+  updateUser: async ({ input }, client) => {
+    const {
+      id,
+      ...updatedFields
+    } = input
+
+    const inputValid = Object.keys(updatedFields).length > 0
 
     if (!inputValid) {
       throw new Error('updateUser resolver received invalid input')
     }
 
-    const snakeCasedInput = camelCaseToSnakeCase(input)
+    const snakeCasedInput = camelCaseToSnakeCase(updatedFields)
 
     const {
       columnNames,
@@ -77,13 +92,19 @@ export const userResolver = {
 
     const updateUserQuery = buildUpdateUserQuery(id, columnNames, columnValues)
 
-    const result = await client.query(updateUserQuery)
+    let updateResult
+
+    try {
+      updateResult = await client.query(updateUserQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', updateUserQuery, originalError)
+    }
 
     const {
       rows: [
         dbUserObject
       ] = []
-    } = result
+    } = updateResult
 
     return mapUser(dbUserObject)
   }

@@ -72,7 +72,12 @@ serverInstance.use('/api/graphqldebug', graphqlHTTP({
   schema: schema,
   rootValue: root,
   graphiql: true,
-  context: client
+  context: client,
+  formatError: (err) => ({
+    ...err,
+    message: JSON.parse(err.message).message,
+    error: JSON.parse(err.message)
+  })
 }))
 
 serverInstance.use('/api/graphql', graphqlHTTP({
@@ -87,7 +92,12 @@ serverInstance.get('/', function (req, res) {
 })
 
 const startGraphQLServer = async (serverInstance, client) => {
-  await client.connect()
+  try {
+    await client.connect()
+  } catch (e) {
+    console.log('DB error: ', e)
+    return
+  }
 
   serverInstance
     .listen(process.env.APP_SERVICE_PORT)

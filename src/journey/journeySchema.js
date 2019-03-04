@@ -30,6 +30,7 @@ export const journeyInput = `
   }
 
   input UpdateJourneyInput {
+    id: Int!
     name: String
     description: String
     date: Int
@@ -73,5 +74,5 @@ export const journeyQuery = `
 
 export const journeyMutation = `
   createJourney(input: CreateJourneyInput!): Journey
-  updateJourney(id: Int!, input: UpdateJourneyInput!): Journey
+  updateJourney(input: UpdateJourneyInput!): Journey
 `

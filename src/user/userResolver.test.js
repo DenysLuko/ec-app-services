@@ -53,6 +53,26 @@ describe('userResolver', () => {
       })
     })
 
+    it('should throw an error with the query and the original error from the client if the get query fails', async () => {
+      const originalGetError = new Error('Some Get Error')
+
+      mockClient = {
+        query: jest.fn().mockRejectedValueOnce(originalGetError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'SELECT * FROM app_user WHERE id = $1;',
+          values: [14]
+        },
+        originalError: originalGetError
+      })
+
+      await expect(getUser({ id: 14 }, mockClient)).rejects.toEqual(expectedError)
+    })
+
     it('should call user mapper with the response', async () => {
       await getUser({ id: 1 }, mockClient)
       expect(mockMapUser).toHaveBeenCalledWith(mockUserResponse)
@@ -98,6 +118,30 @@ describe('userResolver', () => {
       })
     })
 
+    it('should throw an error with the query and the original error from the client if the create query fails', async () => {
+      const originalCreateError = new Error('Some Create Error')
+
+      mockClient = {
+        query: jest.fn().mockRejectedValueOnce(originalCreateError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'INSERT INTO app_user (name) VALUES ($1) RETURNING *;',
+          values: ['AnotherJack']
+        },
+        originalError: originalCreateError
+      })
+
+      await expect(createUser({
+        input: {
+          name: 'AnotherJack'
+        }
+      }, mockClient)).rejects.toEqual(expectedError)
+    })
+
     it('should call user mapper with the response', async () => {
       expect(mockMapUser).toHaveBeenCalledWith(mockUserResponse)
     })
@@ -114,8 +158,8 @@ describe('userResolver', () => {
 
     it('should call client with the correct query if all fields are present', async () => {
       await updateUser({
-        id: 5,
         input: {
+          id: 5,
           name: 'notSoJack',
           lastName: 'notSoBlack'
         }
@@ -127,10 +171,36 @@ describe('userResolver', () => {
       })
     })
 
+    it('should throw an error with the query and the original error from the client if the update query fails', async () => {
+      const originalUpdateError = new Error('Some Update Error')
+
+      mockClient = {
+        query: jest.fn().mockRejectedValueOnce(originalUpdateError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'UPDATE app_user SET name = $2, last_name = $3 WHERE id = $1 RETURNING *;',
+          values: [5, 'notSoJack', 'notSoBlack']
+        },
+        originalError: originalUpdateError
+      })
+
+      await expect(updateUser({
+        input: {
+          id: 5,
+          name: 'notSoJack',
+          lastName: 'notSoBlack'
+        }
+      }, mockClient)).rejects.toEqual(expectedError)
+    })
+
     it('should call user mapper with the response', async () => {
       await updateUser({
-        id: 5,
         input: {
+          id: 5,
           name: 'notSoJack',
           lastName: 'notSoBlack'
         }
@@ -141,8 +211,8 @@ describe('userResolver', () => {
 
     it('should return the result from the mapper', async () => {
       const result = await updateUser({
-        id: 5,
         input: {
+          id: 5,
           name: 'notSoJack',
           lastName: 'notSoBlack'
         }

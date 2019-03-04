@@ -9,7 +9,8 @@ import {
 import {
   generatePlaceholders,
   zipInputObject,
-  camelCaseToSnakeCase
+  camelCaseToSnakeCase,
+  generateQueryError
 } from '../utils'
 
 const buildSearchQuery = ({
@@ -115,17 +116,17 @@ const buildSearchQuery = ({
 }
 
 const buildCreateJourneyQuery = (columnNames = [], columnValues = []) => ({
-  text: `INSERT INTO journey (${columnNames.join(', ')}) VALUES (${generatePlaceholders(columnValues.length)}) RETURNING *;`,
+  text: `INSERT INTO journey (${columnNames.join(', ')}) VALUES (${generatePlaceholders(columnValues.length)}) RETURNING id;`,
   values: [...columnValues]
 })
 
 const buildGetJourneyQuery = (id) => ({
-  text: 'SELECT * FROM journey_view WHERE id = $1;',
+  text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
   values: [id]
 })
 
 const buildUpdateJourneyQuery = (id, columnNames = [], columnValues = []) => ({
-  text: `UPDATE journey SET ${columnNames.map((col, ind) => `${col} = $${ind + 2}`).join(', ')} WHERE id = $1 RETURNING *;`,
+  text: `UPDATE journey SET ${columnNames.map((col, ind) => `${col} = $${ind + 2}`).join(', ')} WHERE id = $1;`,
   values: [id, ...columnValues]
 })
 
@@ -139,12 +140,18 @@ export const journeyResolver = {
 
     const searchQuery = buildSearchQuery(input)
 
-    const result = await client.query(searchQuery)
+    let searchResult
+
+    try {
+      searchResult = await client.query(searchQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', searchQuery, originalError)
+    }
 
     const {
       rowCount,
       rows
-    } = result
+    } = searchResult
 
     const {
       pagination: {
@@ -168,44 +175,78 @@ export const journeyResolver = {
       columnValues
     } = zipInputObject(snakeCasedInput)
 
-    const createUserQuery = buildCreateJourneyQuery(columnNames, columnValues)
+    const createJourneyQuery = buildCreateJourneyQuery(columnNames, columnValues)
 
-    const result = await client.query(createUserQuery)
+    let createResult
+
+    try {
+      createResult = await client.query(createJourneyQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', createJourneyQuery, originalError)
+    }
+
+    const {
+      rows: [
+        {
+          id: newJourneyId
+        }
+      ]
+    } = createResult
+
+    const getQuery = buildGetJourneyQuery(newJourneyId)
+
+    let getJourneyResult
+
+    try {
+      getJourneyResult = await client.query(getQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', getQuery, originalError)
+    }
 
     const {
       rows: [
         dbJourneyObject
-      ] = []
-    } = result
+      ]
+    } = getJourneyResult
 
     return mapJourney(dbJourneyObject)
   },
 
   getJourney: async ({ id }, client) => {
-    const query = buildGetJourneyQuery(id)
+    const getQuery = buildGetJourneyQuery(id)
 
-    const result = await client.query(query)
+    let getResult
+
+    try {
+      getResult = await client.query(getQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', getQuery, originalError)
+    }
 
     const {
       rows: [
         dbJourneyObject
       ] = []
-    } = result
+    } = getResult
 
     return mapJourney(dbJourneyObject)
   },
 
   updateJourney: async ({
-    id,
     input
   }, client) => {
-    const inputValid = Object.keys(input).length > 0
+    const {
+      id,
+      ...updatedFields
+    } = input
+
+    const inputValid = Object.keys(updatedFields).length > 0
 
     if (!inputValid) {
       throw new Error('updateJourney resolver received invalid input')
     }
 
-    const snakeCasedInput = camelCaseToSnakeCase(input)
+    const snakeCasedInput = camelCaseToSnakeCase(updatedFields)
 
     const {
       columnNames,
@@ -214,13 +255,27 @@ export const journeyResolver = {
 
     const updateUserQuery = buildUpdateJourneyQuery(id, columnNames, columnValues)
 
-    const result = await client.query(updateUserQuery)
+    try {
+      await client.query(updateUserQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', updateUserQuery, originalError)
+    }
+
+    const getQuery = buildGetJourneyQuery(id)
+
+    let updatedJourneyResult
+
+    try {
+      updatedJourneyResult = await client.query(getQuery)
+    } catch (originalError) {
+      throw generateQueryError('Query Error', getQuery, originalError)
+    }
 
     const {
       rows: [
         dbUserObject
       ] = []
-    } = result
+    } = updatedJourneyResult
 
     return mapJourney(dbUserObject)
   }

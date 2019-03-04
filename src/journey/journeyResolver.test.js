@@ -20,7 +20,10 @@ describe('journeyResolver', () => {
 
     beforeEach(async () => {
       mockMapperResult = 'mapResult'
-      mockCreateResult = 'clientResult'
+      mockCreateResult = {
+        id: 3,
+        name: 'Some journey'
+      }
 
       mockMapJourney = jest.fn(() => mockMapperResult)
 
@@ -46,9 +49,62 @@ describe('journeyResolver', () => {
 
     it('should call client with the correct query', async () => {
       expect(mockClient.query).toHaveBeenCalledWith({
-        text: 'INSERT INTO journey (name, description, date, user, origin, destination) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;',
+        text: 'INSERT INTO journey (name, description, date, user, origin, destination) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;',
         values: ['LHR -> Moon', 'Take whatever you want', '2044-11-03', 1, 1, 9]
       })
+    })
+
+    it('should throw an error with the query and the original error from the client if the create query fails', async () => {
+      const originalCreateError = new Error('Some Create Error')
+
+      mockClient = {
+        query: jest.fn().mockRejectedValue(originalCreateError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'INSERT INTO journey (name) VALUES ($1) RETURNING id;',
+          values: ['Some journey']
+        },
+        originalError: originalCreateError
+      })
+
+      await expect(createJourney({ input: { name: 'Some journey' } }, mockClient)).rejects
+        .toEqual(expectedError)
+    })
+
+    it('should call client with the correct get query if the creation was successful', async () => {
+      expect(mockClient.query).toHaveBeenCalledWith({
+        text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
+        values: [3]
+      })
+    })
+
+    it('should throw an error with the query and the original error from the client if the get query fails', async () => {
+      const originalGetError = new Error('Some Get Error')
+
+      mockClient = {
+        query: jest.fn()
+          .mockResolvedValueOnce({
+            rows: [mockCreateResult]
+          })
+          .mockRejectedValueOnce(originalGetError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
+          values: [3]
+        },
+        originalError: originalGetError
+      })
+
+      await expect(createJourney({ input: { name: 'Some journey' } }, mockClient)).rejects
+        .toEqual(expectedError)
     })
 
     it('should call journey mapper with the response', async () => {
@@ -63,28 +119,31 @@ describe('journeyResolver', () => {
   describe('updateJourney', () => {
     let mockClient
     let mockMapJourney
+    let mockGetResult
     let mockMapperResult
-    let mockUpdateResult
     let updateJourneyResolverResult
 
     beforeEach(async () => {
       mockMapperResult = 'mapResult'
-      mockUpdateResult = 'clientResult'
+      mockGetResult = 'mockGetResult'
 
       mockMapJourney = jest.fn(() => mockMapperResult)
 
       mockClient = {
-        query: jest.fn().mockResolvedValue({
-          rowCount: 1,
-          rows: [mockUpdateResult]
+        query: jest.fn().mockResolvedValueOnce({
+          rowCount: 0,
+          rows: []
+        }).mockResolvedValueOnce({
+          rowCount:1,
+          rows: [mockGetResult]
         })
       }
 
       journeyResolverRewireAPI.__Rewire__('mapJourney', mockMapJourney)
 
       updateJourneyResolverResult = await updateJourney({
-        id: 14,
         input: {
+          id: 14,
           name: 'newName',
           destination: 2
         }
@@ -92,18 +151,81 @@ describe('journeyResolver', () => {
     })
 
     it('should throw an error if the input is empty', async () => {
-      await expect(updateJourney({id: 1, input: {}}, mockClient)).rejects.toThrowError(Error)
+      await expect(updateJourney({input: { id: 1 }}, mockClient)).rejects.toThrowError(Error)
     })
 
     it('should call client with the correct query', async () => {
       expect(mockClient.query).toHaveBeenCalledWith({
-        text: 'UPDATE journey SET name = $2, destination = $3 WHERE id = $1 RETURNING *;',
+        text: 'UPDATE journey SET name = $2, destination = $3 WHERE id = $1;',
         values: [14, 'newName', 2]
       })
     })
 
+    it('should throw an error with the query and the original error from the client if the update query fails', async () => {
+      const originalUpdateError = new Error('Some Update Error')
+
+      mockClient = {
+        query: jest.fn().mockRejectedValueOnce(originalUpdateError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'UPDATE journey SET name = $2, destination = $3 WHERE id = $1;',
+          values: [14, 'newName', 2]
+        },
+        originalError: originalUpdateError
+      })
+
+      await expect(updateJourney({
+        input: {
+          id: 14,
+          name: 'newName',
+          destination: 2
+        }
+      }, mockClient)).rejects.toEqual(expectedError)
+    })
+
+    it('should call client with the correct get query if the update was successful', async () => {
+      expect(mockClient.query).toHaveBeenCalledWith({
+        text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
+        values: [14]
+      })
+    })
+
+    it('should throw an error with the query and the original error from the client if the get query fails', async () => {
+      const originalGetError = new Error('Some Get Error')
+
+      mockClient = {
+        query: jest.fn()
+          .mockResolvedValueOnce({
+            rows: []
+          })
+          .mockRejectedValueOnce(originalGetError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
+          values: [14]
+        },
+        originalError: originalGetError
+      })
+
+      await expect(updateJourney({
+        input: {
+          id: 14,
+          name: 'newName',
+          destination: 2
+        }
+      }, mockClient)).rejects.toEqual(expectedError)
+    })
+
     it('should call journeyMapper with the result returned from the client', () => {
-      expect(mockMapJourney).toHaveBeenCalledWith(mockUpdateResult)
+      expect(mockMapJourney).toHaveBeenCalledWith(mockGetResult)
     })
 
     it('should return the mapper result', () => {
@@ -138,9 +260,29 @@ describe('journeyResolver', () => {
 
     it('should call client with the correct query', async () => {
       expect(mockClient.query).toHaveBeenCalledWith({
-        text: 'SELECT * FROM journey_view WHERE id = $1;',
+        text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
         values: [44]
       })
+    })
+
+    it('should throw an error with the query and the original error from the client if the get query fails', async () => {
+      const originalGetError = new Error('Some Get Error')
+
+      mockClient = {
+        query: jest.fn().mockRejectedValueOnce(originalGetError)
+      }
+
+      const expectedError = JSON.stringify({
+        type: 'queryError',
+        message: 'Query Error',
+        query: {
+          text: 'SELECT * FROM journey_view WHERE journey_id = $1;',
+          values: [14]
+        },
+        originalError: originalGetError
+      })
+
+      await expect(getJourney({ id: 14 }, mockClient)).rejects.toEqual(expectedError)
     })
 
     it('should call journey mapper with the response', async () => {
@@ -220,6 +362,33 @@ describe('journeyResolver', () => {
           text: `SELECT * FROM journey_view WHERE ${dateClause} AND ${expectedFromLocationClause} AND ${expectedToLocationClause} ${limitClause} ${offsetClause};`,
           values: ['2019-01-30', '2019-02-03', 50, 50, 10, 51, 49, 5, 10, 10]
         })
+      })
+
+      it('should throw an error with the query and the original error from the client if the search query fails', async () => {
+        const originalSearchError = new Error('Some Search Error')
+
+        mockClient = {
+          query: jest.fn().mockRejectedValueOnce(originalSearchError)
+        }
+
+        const expectedError = JSON.stringify({
+          type: 'queryError',
+          message: 'Query Error',
+          query: {
+            text: 'SELECT * FROM journey_view LIMIT $1 OFFSET $2;',
+            values: [10, 10]
+          },
+          originalError: originalSearchError
+        })
+
+        await expect(searchJourney({
+          input: {
+            pagination: {
+              limit: 10,
+              offset: 10
+            }
+          }
+        }, mockClient)).rejects.toEqual(expectedError)
       })
 
       describe('limit/offset', () => {
@@ -376,7 +545,7 @@ describe('journeyResolver', () => {
       })
     })
 
-    it('should call MapJourneySearch with the result and the offset', async () => {
+    it('should call mapJourneySearch with the result and the offset', async () => {
       await searchJourney({
         input: {
           pagination: {
@@ -392,7 +561,7 @@ describe('journeyResolver', () => {
       }, 10)
     })
 
-    it('should call MapJourneySearch with the result and offset set to 0 if no pagination was given', async () => {
+    it('should call mapJourneySearch with the result and offset set to 0 if no pagination was given', async () => {
       await searchJourney({
         input: {}
       }, mockClient)
