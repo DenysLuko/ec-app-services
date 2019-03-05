@@ -1,5 +1,6 @@
 import {
   mapDelivery,
+  // eslint-disable-next-line import/named
   __RewireAPI__ as mapDeliveryRewireAPI
 } from './deliveryMapper'
 
@@ -80,7 +81,7 @@ describe('deliveryMapper', () => {
       mockMapUserResult = 'user'
 
       mockMapJourney = jest.fn(() => mockMapJourneyResult)
-      mockMapUser = jest.fn(({id}) => mockMapUserResult + id)
+      mockMapUser = jest.fn(({ id }) => mockMapUserResult + id)
 
       mapDeliveryRewireAPI.__Rewire__('mapJourney', mockMapJourney)
       mapDeliveryRewireAPI.__Rewire__('mapUser', mockMapUser)

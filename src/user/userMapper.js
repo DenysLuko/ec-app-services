@@ -27,7 +27,7 @@ export const mapUser = ({
     email,
     age,
     photo,
-    birthday ({
+    birthday({
       format
     }) {
       return mapDate(birthday, format)

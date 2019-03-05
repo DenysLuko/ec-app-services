@@ -1,6 +1,7 @@
 import {
   mapJourneySearch,
   mapJourney,
+  // eslint-disable-next-line import/named
   __RewireAPI__ as mapJourneySearchRewireAPI
 } from './journeyMapper'
 
@@ -109,7 +110,7 @@ describe('journeyMapper', () => {
     let mockMapUser
 
     beforeEach(() => {
-      mockMapUser = jest.fn(({ id }) => 'user' + id)
+      mockMapUser = jest.fn(({ id }) => `user${id}`)
       mapJourneySearchRewireAPI.__Rewire__('mapUser', mockMapUser)
       mapperResult = mapJourney(mockSearchResponse.rows[0])
     })
@@ -226,7 +227,7 @@ describe('journeyMapper', () => {
         let mockMapUser
 
         beforeEach(() => {
-          mockMapUser = jest.fn(({ id }) => 'user' + id)
+          mockMapUser = jest.fn(({ id }) => `user${id}`)
           mapJourneySearchRewireAPI.__Rewire__('mapUser', mockMapUser)
           mapJourneySearch(mockSearchResponse, 0)
         })

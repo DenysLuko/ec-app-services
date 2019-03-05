@@ -6,7 +6,7 @@ import {
   generateQueryError
 } from '../utils'
 
-const buildGetDeliveryQuery = (id) => ({
+const buildGetDeliveryQuery = id => ({
   text: 'SELECT * FROM delivery_view WHERE delivery_id = $1;',
   values: [id]
 })

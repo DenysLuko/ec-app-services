@@ -94,7 +94,6 @@ export const mapJourneySearch = ({
   rowCount = 0,
   rows = []
 }, offset) => {
-
   const results = rows.map(mapJourney)
 
   return {

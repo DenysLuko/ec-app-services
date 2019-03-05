@@ -1,6 +1,4 @@
-import "@babel/polyfill"
-
-require('dotenv').config()
+import '@babel/polyfill'
 
 import {
   Client,
@@ -30,6 +28,8 @@ import {
   deliveryMutation,
   deliveryResolver
 } from './delivery'
+
+require('dotenv').config()
 
 types.setTypeParser(20, parseInt)
 
@@ -69,11 +69,11 @@ const root = {
 }
 
 serverInstance.use('/api/graphqldebug', graphqlHTTP({
-  schema: schema,
+  schema,
   rootValue: root,
   graphiql: true,
   context: client,
-  formatError: (err) => ({
+  formatError: err => ({
     ...err,
     message: JSON.parse(err.message).message,
     error: JSON.parse(err.message)
@@ -81,39 +81,43 @@ serverInstance.use('/api/graphqldebug', graphqlHTTP({
 }))
 
 serverInstance.use('/api/graphql', graphqlHTTP({
-  schema: schema,
+  schema,
   rootValue: root,
   graphiql: false,
   context: client
 }))
 
-serverInstance.get('/', function (req, res) {
+serverInstance.get('/', (req, res) => {
   res.send('hello world')
 })
 
-const startGraphQLServer = async (serverInstance, client) => {
+const startGraphQLServer = async (serverArg, clientArg) => {
   try {
-    await client.connect()
+    await clientArg.connect()
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.log('DB error: ', e)
     return
   }
 
-  serverInstance
+  serverArg
     .listen(process.env.APP_SERVICE_PORT)
     .on('listening', () => {
+      // eslint-disable-next-line no-console
       console.log(`Example app listening on port ${process.env.APP_SERVICE_PORT}!`)
     })
     .on('error', async (err) => {
+      // eslint-disable-next-line no-console
       console.log('Server error.')
+      // eslint-disable-next-line no-console
       console.log(err)
-      await client.disconnect()
+      await clientArg.disconnect()
     })
     .on('close', async () => {
+      // eslint-disable-next-line no-console
       console.log('Server closing.')
-      await client.disconnect()
+      await clientArg.disconnect()
     })
-
 }
 
 startGraphQLServer(serverInstance, client)
