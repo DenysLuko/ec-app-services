@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test:watch": "./node_modules/.bin/nodemon --exec \"jest\"",
-    "test": "jest",
     "build": "rm -rf ./build && ./node_modules/.bin/babel src -d build",
+    "test": "jest",
+    "test:watch": "./node_modules/.bin/nodemon --exec \"jest\"",
     "start": "npm run build && node ./build",
-    "watch": "./node_modules/.bin/nodemon --exec \"npm run start\"",
+    "start:watch": "./node_modules/.bin/nodemon --exec \"npm run start\"",
     "lint": "./node_modules/.bin/eslint ./src"
   },
   "author": "Denys Lutsenko",
@@ -25,8 +25,11 @@
     "lodash.reduce": "^4.6.0",
     "lodash.snakecase": "^4.1.1",
     "lodash.zip": "^4.2.0",
+    "lodash.clonedeep": "^4.5.0",
     "moment": "^2.24.0",
     "pg": "^7.8.0",
+    "uuid": "^3.3.2",
+    "ws": "^6.2.0",
     "zip": "^1.2.0"
   },
   "devDependencies": {

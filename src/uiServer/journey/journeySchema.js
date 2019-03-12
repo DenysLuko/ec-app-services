@@ -51,11 +51,11 @@ export const journeyType = `
   }
 
   type Journey {
-    journeyName: String!
-    journeyDescription: String
+    name: String!
+    description: String
     travellingUser: User!
-    journeyDate(format: String): String
-    journeyStatus: String!
+    date(format: String): String
+    status: String!
     origin: Location!
     destination: Location!
   }

@@ -75,14 +75,14 @@ export const mapJourney = ({
   }
 
   return {
-    journeyId,
-    journeyName,
-    journeyDescription,
-    journeyStatus,
+    id: journeyId,
+    name: journeyName,
+    description: journeyDescription,
+    status: journeyStatus,
     travellingUser,
     origin,
     destination,
-    journeyDate({
+    date({
       format
     }) {
       return mapDate(journeyDate, format)

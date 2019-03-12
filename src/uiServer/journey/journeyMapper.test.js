@@ -115,20 +115,20 @@ describe('journeyMapper', () => {
       mapperResult = mapJourney(mockSearchResponse.rows[0])
     })
 
-    it('should return the correct journeyId', () => {
-      expect(mapperResult).toHaveProperty('journeyId', 1)
+    it('should return the correct id', () => {
+      expect(mapperResult).toHaveProperty('id', 1)
     })
 
-    it('should return the correct journeyName', () => {
-      expect(mapperResult).toHaveProperty('journeyName', 'London -> New York')
+    it('should return the correct name', () => {
+      expect(mapperResult).toHaveProperty('name', 'London -> New York')
     })
 
-    it('should return the correct journeyDescription', () => {
-      expect(mapperResult).toHaveProperty('journeyDescription', 'Can take anything you like')
+    it('should return the correct descriptions', () => {
+      expect(mapperResult).toHaveProperty('description', 'Can take anything you like')
     })
 
-    it('should return the correct journeyStatus', () => {
-      expect(mapperResult).toHaveProperty('journeyStatus', 'complete')
+    it('should return the correct status', () => {
+      expect(mapperResult).toHaveProperty('status', 'complete')
     })
 
     it('should call mapUser with the correct arguments', () => {
@@ -199,28 +199,28 @@ describe('journeyMapper', () => {
         thirdResult = resultThree
       })
 
-      it('should return the correct journeyIds', () => {
-        expect(firstResult).toHaveProperty('journeyId', 1)
-        expect(secondResult).toHaveProperty('journeyId', 2)
-        expect(thirdResult).toHaveProperty('journeyId', 4)
+      it('should return the correct ids', () => {
+        expect(firstResult).toHaveProperty('id', 1)
+        expect(secondResult).toHaveProperty('id', 2)
+        expect(thirdResult).toHaveProperty('id', 4)
       })
 
-      it('should return the correct journeyNames', () => {
-        expect(firstResult).toHaveProperty('journeyName', 'London -> New York')
-        expect(secondResult).toHaveProperty('journeyName', 'London -> New York')
-        expect(thirdResult).toHaveProperty('journeyName', 'London -> New York')
+      it('should return the correct names', () => {
+        expect(firstResult).toHaveProperty('name', 'London -> New York')
+        expect(secondResult).toHaveProperty('name', 'London -> New York')
+        expect(thirdResult).toHaveProperty('name', 'London -> New York')
       })
 
-      it('should return the correct journeyDescriptions', () => {
-        expect(firstResult).toHaveProperty('journeyDescription', 'Can take anything you like')
-        expect(secondResult).toHaveProperty('journeyDescription', null)
-        expect(thirdResult).toHaveProperty('journeyDescription', 'Able to take documents only')
+      it('should return the correct descriptions', () => {
+        expect(firstResult).toHaveProperty('description', 'Can take anything you like')
+        expect(secondResult).toHaveProperty('description', null)
+        expect(thirdResult).toHaveProperty('description', 'Able to take documents only')
       })
 
-      it('should return the correct journeyStatuses', () => {
-        expect(firstResult).toHaveProperty('journeyStatus', 'complete')
-        expect(secondResult).toHaveProperty('journeyStatus', 'complete')
-        expect(thirdResult).toHaveProperty('journeyStatus', 'upcoming')
+      it('should return the correct statuses', () => {
+        expect(firstResult).toHaveProperty('status', 'complete')
+        expect(secondResult).toHaveProperty('status', 'complete')
+        expect(thirdResult).toHaveProperty('status', 'upcoming')
       })
 
       describe('travellingUser', () => {
@@ -278,15 +278,15 @@ describe('journeyMapper', () => {
         })
       })
 
-      describe('journeyDate formatting', () => {
+      describe('date formatting', () => {
         it('should return the correct format if requested', () => {
-          expect(firstResult.journeyDate({ format: 'YYYY' })).toEqual('2018')
-          expect(secondResult.journeyDate({ format: 'YYYY MMM DD' })).toEqual('2019 Jan 19')
-          expect(thirdResult.journeyDate({ format: 'DD-MM-YYYY' })).toEqual('19-12-2018')
+          expect(firstResult.date({ format: 'YYYY' })).toEqual('2018')
+          expect(secondResult.date({ format: 'YYYY MMM DD' })).toEqual('2019 Jan 19')
+          expect(thirdResult.date({ format: 'DD-MM-YYYY' })).toEqual('19-12-2018')
         })
 
         it('should return the date object if no format is passed', () => {
-          expect(firstResult.journeyDate({})).toEqual(mockSearchResponse.rows[0].journey_date)
+          expect(firstResult.date({})).toEqual(mockSearchResponse.rows[0].journey_date)
         })
       })
 
