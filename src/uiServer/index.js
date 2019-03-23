@@ -23,6 +23,13 @@ import {
   deliveryMutation,
   deliveryResolver
 } from './delivery'
+import {
+  chatInput,
+  chatType,
+  chatQuery,
+  chatMutation,
+  chatResolver
+} from './chat'
 
 require('dotenv').config()
 
@@ -33,22 +40,27 @@ const schema = buildSchema(`
   ${journeyType}
   ${deliveryInput}
   ${deliveryType}
+  ${chatInput}
+  ${chatType}
   type Query {
     ${userQuery}
     ${journeyQuery}
     ${deliveryQuery}
+    ${chatQuery}
   }
   type Mutation {
     ${userMutation}
     ${journeyMutation}
     ${deliveryMutation}
+    ${chatMutation}
   }
 `)
 
 const root = {
   ...userResolver,
   ...journeyResolver,
-  ...deliveryResolver
+  ...deliveryResolver,
+  ...chatResolver
 }
 
 export const startGraphQLServer = async (expressApp, clientArg) => {
@@ -57,11 +69,19 @@ export const startGraphQLServer = async (expressApp, clientArg) => {
     rootValue: root,
     graphiql: true,
     context: clientArg,
-    formatError: err => ({
-      ...err,
-      message: JSON.parse(err.message).message,
-      error: JSON.parse(err.message)
-    })
+    formatError: (err) => {
+      try {
+        const errMessage = {
+          ...err,
+          message: JSON.parse(err.message).message,
+          error: JSON.parse(err.message)
+        }
+
+        return errMessage
+      } catch (e) {
+        return err
+      }
+    }
   }))
 
   expressApp.use('/api/graphql', graphqlHTTP({
